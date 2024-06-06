@@ -5,7 +5,7 @@ from io import BytesIO
 import base64
 
 st.title("Upload and Process Image")
-st.markdown("[FastAPI Documentation](http://127.0.0.1:8000/docs)")
+st.markdown("[FastAPI Documentation](https://fastapistreamlit-im4zw4v7vq-et.a.run.app/docs)")
 
 uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
 
@@ -16,7 +16,7 @@ if uploaded_file is not None:
 
     # Send image to FastAPI server
     response = requests.post(
-        "http://127.0.0.1:8000/process_image/",
+        "https://fastapistreamlit-im4zw4v7vq-et.a.run.app/process_image/",
         files={"file": uploaded_file.getvalue()}
     )
 

@@ -17,11 +17,8 @@ COPY . ./
 RUN pip install --no-cache-dir --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Use an environment variable for the port number
-ENV PORT 8080
-
 # Expose the port
-EXPOSE $PORT
+EXPOSE 8080
 
 # Use the environment variable in the gunicorn command
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
