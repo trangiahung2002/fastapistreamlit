@@ -7,7 +7,7 @@ from io import BytesIO
 st.title("Upload and Process Image")
 
 uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
-st.markdown("[FastAPI Documentation](http://localhost:8000/docs)")
+st.markdown("[FastAPI Documentation](https://fastapistreamlit-im4zw4v7vq-et.a.run.app/docs)")
 
 if uploaded_file is not None:
     image = Image.open(uploaded_file)
@@ -19,7 +19,7 @@ if uploaded_file is not None:
     img_str = base64.b64encode(buffered.getvalue()).decode()
 
     # Send image to FastAPI server
-    response = requests.post("http://localhost:8000/process_image", json={"data": img_str})
+    response = requests.post("https://fastapistreamlit-im4zw4v7vq-et.a.run.app", json={"data": img_str})
 
     # Display processed image
     if response.status_code == 200:

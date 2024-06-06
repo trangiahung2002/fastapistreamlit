@@ -24,4 +24,4 @@ ENV PORT 8080
 EXPOSE $PORT
 
 # Use the environment variable in the gunicorn command
-CMD exec gunicorn --bind :$PORT --workers 1 --threads 8 --timeout 0 app:app
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
