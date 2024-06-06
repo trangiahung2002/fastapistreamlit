@@ -1,27 +1,35 @@
 import streamlit as st
 import requests
-import base64
 from PIL import Image
 from io import BytesIO
+import base64
 
 st.title("Upload and Process Image")
+st.markdown("[FastAPI Documentation](http://127.0.0.1:8000/docs)")
 
 uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
-st.markdown("[FastAPI Documentation](https://fastapistreamlit-im4zw4v7vq-et.a.run.app/docs)")
 
 if uploaded_file is not None:
     image = Image.open(uploaded_file)
-    st.image(image, caption='Uploaded Image', use_column_width=True)
-
-    # Convert image to base64
-    buffered = BytesIO()
-    image.save(buffered, format="JPEG")
-    img_str = base64.b64encode(buffered.getvalue()).decode()
+    st.subheader("Original Image")
+    # st.image(image, caption='Uploaded Image', use_column_width=True)
 
     # Send image to FastAPI server
-    response = requests.post("https://fastapistreamlit-im4zw4v7vq-et.a.run.app", json={"data": img_str})
+    response = requests.post(
+        "http://127.0.0.1:8000/process_image/",
+        files={"file": uploaded_file.getvalue()}
+    )
 
-    # Display processed image
     if response.status_code == 200:
-        processed_image = Image.open(BytesIO(base64.b64decode(response.json()["processed_image"])))
-        st.image(processed_image, caption='Processed Image', use_column_width=True)
+        response_data = response.json()
+        original_image_base64 = response_data["original_image"]
+        processed_image_base64 = response_data["processed_image"]
+
+        original_image = Image.open(BytesIO(base64.b64decode(original_image_base64)))
+        processed_image = Image.open(BytesIO(base64.b64decode(processed_image_base64)))
+
+        st.image(original_image, caption='Original Image (Base64)', use_column_width=True)
+        st.subheader("Processed Image")
+        st.image(processed_image, caption='Processed Image (Grayscale)', use_column_width=True)
+    else:
+        st.error(f"Error: {response.status_code}, {response.text}")
