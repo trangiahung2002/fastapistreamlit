@@ -169,7 +169,7 @@ async def process_brain_images(files: list[UploadFile] = File(...)):
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-@app.post("/predicts_chest_images/")
+@app.post("/predict_chest_images/")
 async def process_chest_images(files: list[UploadFile] = File(...)):
     try:
         results = []
