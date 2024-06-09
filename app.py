@@ -98,7 +98,8 @@ import base64
 import cv2
 import numpy as np
 
-hostname = 'http://localhost:8000'
+# hostname = 'http://localhost:8000'
+hostname = 'https://fastapistreamlit-im4zw4v7vq-et.a.run.app'
 
 def draw_boxes(image, objects):
     image_array = np.array(image)
