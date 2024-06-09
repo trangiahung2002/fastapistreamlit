@@ -3,33 +3,89 @@ import requests
 from PIL import Image
 from io import BytesIO
 import base64
+import cv2
+import numpy as np
 
-st.title("Upload and Process Image")
-st.markdown("[FastAPI Documentation](https://fastapistreamlit-im4zw4v7vq-et.a.run.app/docs)")
+def draw_boxes(image, objects):
+    image_array = np.array(image)
+    for obj in objects:
+        x1, y1, x2, y2 = map(int, obj['bbox'])
+        label = f"{obj['label']} ({obj['confidence']:.2f})"
 
-uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
+        cv2.rectangle(image_array, (x1, y1), (x2, y2), (0, 255, 0), 2)
 
-if uploaded_file is not None:
-    image = Image.open(uploaded_file)
-    st.subheader("Original Image")
-    # st.image(image, caption='Uploaded Image', use_column_width=True)
+        font_scale = 0.5
+        font_thickness = 1
+        text_size = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, font_scale, font_thickness)[0]
+        text_x = x1
+        text_y = y1 - 10 if y1 - 10 > 10 else y1 + 10
 
-    # Send image to FastAPI server
-    response = requests.post(
-        "https://fastapistreamlit-im4zw4v7vq-et.a.run.app/process_image/",
-        files={"file": uploaded_file.getvalue()}
-    )
+        cv2.rectangle(image_array, (text_x, text_y - text_size[1] - 5), (text_x + text_size[0], text_y + 5),
+                      (0, 255, 0), -1)
 
-    if response.status_code == 200:
-        response_data = response.json()
-        original_image_base64 = response_data["original_image"]
-        processed_image_base64 = response_data["processed_image"]
+        cv2.putText(image_array, label, (text_x, text_y), cv2.FONT_HERSHEY_SIMPLEX, font_scale, (0, 0, 0),
+                    font_thickness)
 
-        original_image = Image.open(BytesIO(base64.b64decode(original_image_base64)))
-        processed_image = Image.open(BytesIO(base64.b64decode(processed_image_base64)))
+    return Image.fromarray(image_array)
+def main():
+    st.title("Main Page")
+    st.write("Choose an option from the sidebar to proceed.")
 
-        st.image(original_image, caption='Original Image (Base64)', use_column_width=True)
-        st.subheader("Processed Image")
-        st.image(processed_image, caption='Processed Image (Grayscale)', use_column_width=True)
-    else:
-        st.error(f"Error: {response.status_code}, {response.text}")
+def runDetection(apilink):
+    # st.markdown("[FastAPI Documentation](https://fastapistreamlit-im4zw4v7vq-et.a.run.app/docs)")
+    st.markdown("[FastAPI Documentation](http://localhost:8000/docs)")
+    uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
+
+    if uploaded_file is not None:
+        confidence_threshold = st.slider("Confidence Threshold", 0.0, 1.0, 0.5, step=0.1)
+
+        image = Image.open(uploaded_file)
+
+        # Send image to FastAPI server
+        response = requests.post(
+            apilink,
+            files={"file": uploaded_file.getvalue()}
+        )
+
+        if response.status_code == 200:
+            response_data = response.json()
+            processed_image_base64 = response_data["processed_image_base64"]
+            detection_info = response_data["detection_info"]
+
+            # Decode processed image from base64
+            processed_image = Image.open(BytesIO(base64.b64decode(processed_image_base64)))
+
+            filtered_objects = [
+                obj for obj in detection_info['objects']
+                if obj['confidence'] >= confidence_threshold
+            ]
+
+            plotted_image = draw_boxes(processed_image, filtered_objects)
+
+            col1, col2 = st.columns(2)
+
+            with col1:
+                st.image(image, caption='Uploaded Image', use_column_width=True)
+            with col2:
+                st.image(plotted_image, caption='Predicted Image', use_column_width=True)
+                response_data['detection_info']['objects'] = filtered_objects
+                st.json(response_data)
+
+        else:
+            st.error(f"Error: {response.status_code}, {response.text}")
+
+
+
+# Sidebar for navigation
+st.sidebar.title("Navigation")
+page = st.sidebar.selectbox("Go to", ["Main Page", "Brain Tumor Detection", "Chest Nodule Detection"])
+
+# Display the selected page
+if page == "Main Page":
+    main()
+elif page == "Brain Tumor Detection":
+    st.title("Brain Tumor Detection")
+    runDetection('http://localhost:8000/process_brain_image/')
+elif page == "Chest Nodule Detection":
+    st.title("Chest Nodule Detection")
+    runDetection('http://localhost:8000/process_chest_image/')
