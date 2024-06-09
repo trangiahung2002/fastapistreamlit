@@ -110,8 +110,8 @@ import uvicorn
 from ultralytics import YOLO
 
 app = FastAPI()
-model_brain = YOLO('brain.pt')
-model_chest = YOLO('chest.pt')
+model_brain = YOLO('weights/brain.pt')
+model_chest = YOLO('weights/chest.pt')
 
 def convert_image_to_base64(image: Image.Image) -> str:
     buffered = BytesIO()
@@ -151,7 +151,7 @@ def getDetectionInfo(image, model):
     }
     return image, data
 
-@app.post("/process_brain_images/")
+@app.post("/predict_images/")
 async def process_brain_images(files: list[UploadFile] = File(...)):
     try:
         results = []
