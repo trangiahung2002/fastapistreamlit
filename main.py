@@ -151,7 +151,7 @@ def getDetectionInfo(image, model):
     }
     return image, data
 
-@app.post("/predict_images/")
+@app.post("/predict_brain_images/")
 async def process_brain_images(files: list[UploadFile] = File(...)):
     try:
         results = []

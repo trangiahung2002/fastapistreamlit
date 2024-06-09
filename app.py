@@ -174,9 +174,9 @@ if page == "Main Page":
     main()
 elif page == "Brain Tumor Detection":
     st.title("Brain Tumor Detection")
-    runDetection(f'{hostname}/predict_images/')
+    runDetection(f'{hostname}/predict_brain_images/')
 elif page == "Chest Nodule Detection":
     st.title("Chest Nodule Detection")
-    runDetection(f'{hostname}/predict_images/')
+    runDetection(f'{hostname}/predict_chest_images/')
 
 
