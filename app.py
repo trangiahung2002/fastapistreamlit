@@ -101,6 +101,29 @@ import numpy as np
 # hostname = 'http://localhost:8000'
 hostname = 'https://fastapistreamlit-im4zw4v7vq-et.a.run.app'
 
+sample_brain_images = {
+    "Sample 1": "samples/brain_sample (1).jpg",
+    "Sample 2": "samples/brain_sample (2).jpg",
+    "Sample 3": "samples/brain_sample (3).jpg",
+    "Sample 4": "samples/brain_sample (4).jpg",
+    "Sample 5": "samples/brain_sample (5).jpg",
+}
+
+sample_chest_images = {
+    "Sample 1": "samples/chest_sample (1).jpg",
+    "Sample 2": "samples/chest_sample (2).jpg",
+    "Sample 3": "samples/chest_sample (3).jpg",
+    "Sample 4": "samples/chest_sample (4).jpg",
+    "Sample 5": "samples/chest_sample (5).jpg",
+}
+
+def display_samples(sample_images):
+    cols = st.columns(len(sample_images))
+    for i, (sample_name, sample_path) in enumerate(sample_images.items()):
+        with cols[i]:
+            image = Image.open(sample_path)
+            st.image(image, caption=sample_name, use_column_width=True)
+
 def draw_boxes(image, objects):
     image_array = np.array(image)
     for obj in objects:
@@ -121,7 +144,6 @@ def draw_boxes(image, objects):
 def runDetection(apilink):
 
     uploaded_files = st.file_uploader("Choose images...", type=["jpg", "jpeg", "png"], accept_multiple_files=True)
-    st.markdown(f"[FastAPI Documentation]({hostname}/docs)")
 
     if uploaded_files:
         confidence_threshold = st.slider("Confidence Threshold", 0.0, 1.0, 0.1, step=0.1)
@@ -174,9 +196,13 @@ if page == "Main Page":
     main()
 elif page == "Brain Tumor Detection":
     st.title("Brain Tumor Detection")
+    st.markdown(f"[FastAPI Documentation]({hostname}/docs)")
+    display_samples(sample_brain_images)
     runDetection(f'{hostname}/predict_brain_images/')
 elif page == "Chest Nodule Detection":
     st.title("Chest Nodule Detection")
+    st.markdown(f"[FastAPI Documentation]({hostname}/docs)")
+    display_samples(sample_chest_images)
     runDetection(f'{hostname}/predict_chest_images/')
 
 
