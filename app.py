@@ -99,8 +99,8 @@ import cv2
 import numpy as np
 import torch
 
-hostname = 'http://localhost:8000'
-# hostname = 'https://fastapistreamlit-im4zw4v7vq-et.a.run.app'
+# hostname = 'http://localhost:8000'
+hostname = 'https://fastapistreamlit-im4zw4v7vq-et.a.run.app'
 
 sample_brain_images = {
     "Sample 1": "samples/brain_sample (1).jpg",
